@@ -19,12 +19,11 @@ public class ProductVO {
     // toString()
     @Override
     public String toString() {
-        return "ProductVO{" +
-                "productID=" + productID +
-                ", product='" + product + '\'' +
-                ", price=" + price +
-                ", stock=" + stock +
-                '}';
+        return "[제품ID=" + productID +
+                ", 제품명=" + product +
+                ", 가격=" + price +
+                ", 재고=" + stock +
+                ']';
     }
 
     // Getter, Setter

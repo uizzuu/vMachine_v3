@@ -1,36 +1,49 @@
 package vo;
 
 public class MemberVO {
+    private int mid;
     private String id;
     private String pw;
     private String name;
     private String phone;
     private int money;
+    private String cardNo;
 
     // 생성자
     public MemberVO(){}
 
-    public MemberVO(String id, String pw, String name, String phone, int money) {
+    public MemberVO(int mid, String id, String pw, String name, String phone, int money, String cardNo) {
+        this.mid = mid;
         this.id = id;
         this.pw = pw;
         this.name = name;
         this.phone = phone;
         this.money = money;
+        this.cardNo = cardNo;
     }
 
     // toString()
     @Override
     public String toString() {
-        return "MemberVO{" +
-                "id='" + id + '\'' +
-                ", pw='" + pw + '\'' +
-                ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", money=" + money +
-                '}';
+        return "[회원ID=" + mid +
+                ", 아이디=" + id +
+                ", 비밀번호=" + pw +
+                ", 회원명=" + name +
+                ", 전화번호='" + phone +
+                ", 보유금액=" + money +
+                ", 카드번호=" + cardNo +
+                ']';
     }
 
     // Getter, Setter
+
+    public int getMId() {
+        return mid;
+    }
+
+    public void setMId(int mid) {
+        this.mid = mid;
+    }
 
     public String getId() {
         return id;
@@ -70,5 +83,13 @@ public class MemberVO {
 
     public void setMoney(int money) {
         this.money = money;
+    }
+
+    public String getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
     }
 }

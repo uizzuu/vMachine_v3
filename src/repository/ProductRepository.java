@@ -32,6 +32,12 @@ public class ProductRepository {
         productMap.remove(productID);
     }
 
+    // ID 자동 생성
+    private int productIdSeq = 1;
+    public int generateId() {
+        return productIdSeq++;
+    }
+
     // 제품 존재 여부 확인
     public boolean existById(int productID) {
         return productMap.containsKey(productID);
