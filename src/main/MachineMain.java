@@ -1,22 +1,32 @@
 package main;
 
+import db.DBConn;
 import exception.MyException;
 import service.MemberService;
 import service.ProductService;
+import service.SaleService;
 import vo.MemberVO;
 import vo.ProductVO;
+import vo.SaleVO;
 
+import java.sql.Connection;
+import java.util.List;
 import java.util.Scanner;
 
 public class MachineMain {
+
     private static MemberService ms = new MemberService();
     private static ProductService ps = new ProductService();
+    private static SaleService ss = new SaleService();
 
     private static Scanner sc = new Scanner(System.in);
 
     private static MemberVO loginMember = null;
 
     public static void main(String[] args) {
+        // DB연결
+        Connection conn = DBConn.getConnection();
+
         while (true) {
             if (loginMember == null) {
                 showLoginMenu();
@@ -27,30 +37,30 @@ public class MachineMain {
     }
 
     private static void showLoginMenu() {
-        System.out.println("=== 자판기(회원제) === ");
-        System.out.println("1.회원가입 2.로그인 3.종료 0.관리자");
-        int input = sc.nextInt();
-
-        switch (input) {
-            case 0:
-                showAdminMenu();
-                break;
-            case 1:
-                // 회원가입
-                signup();
-                break;
-            case 2:
-                // 로그인
-                login();
-                break;
-            case 3:
-                // 종료
-                System.out.println("프로그램 종료");
-                return;
-            default:
-                System.out.println("잘못된 입력입니다.");
+            System.out.println("\n=== 자판기(회원제) === ");
+            System.out.println("1.회원가입 2.로그인 3.종료 0.관리자");
+            int input = sc.nextInt();
+            switch (input) {
+                case 0:
+                    showAdminMenu();
+                    break;
+                case 1:
+                    // 회원가입
+                    signup();
+                    break;
+                case 2:
+                    // 로그인
+                    login();
+                    break;
+                case 3:
+                    // 종료
+                    System.out.println("프로그램 종료");
+                    return;
+                default:
+                    System.out.println("잘못된 입력입니다.");
+                    break;
+            }
         }
-    }
 
     private static void signup() {
         try {
@@ -93,7 +103,7 @@ public class MachineMain {
     }
 
     private static void showAdminMenu() {
-        System.out.println("=== 관리자(admin) 메뉴 ===");
+        System.out.println("\n=== 관리자(admin) 메뉴 ===");
         System.out.println("1.자판기관리 2.회원관리 3.판매관리 4.로그아웃");
         int input = sc.nextInt();
 
@@ -118,14 +128,14 @@ public class MachineMain {
 
     private static void manageVmachine() {
         while (true) {
-            System.out.println("=== 자판기 관리 ===");
+            System.out.println("\n=== 자판기 관리 ===");
             System.out.println("1.제품추가 2.제품수정 3.제품삭제 4.제품목록 5.돌아가기");
             int input = sc.nextInt();
 
             switch (input) {
                 case 1:
                     // 제품 추가
-                    System.out.println("=== 제품 추가 ===");
+                    System.out.println("\n=== 제품 추가 ===");
                     System.out.println("이름 : ");
                     String name = sc.next();
                     System.out.println("가격 : ");
@@ -135,7 +145,6 @@ public class MachineMain {
                     int pid = ps.generateProductId();
                     ProductVO p = new ProductVO(pid, name, price, stock);
                     ps.addProduct(p);
-                    System.out.println("제품 추가가 완료되었습니다.");
                     break;
                 case 2:
                     // 제품 수정
@@ -176,7 +185,7 @@ public class MachineMain {
     }
 
     private static void showProduct() {
-        System.out.println("=== 전체 제품 목록 ===");
+        System.out.println("\n=== 전체 제품 목록 ===");
         for (ProductVO pvo : ps.listProducts()) {
             System.out.println(pvo);
         }
@@ -184,7 +193,7 @@ public class MachineMain {
 
     private static void manageMembers() {
         while (true) {
-            System.out.println("=== 회원 관리 ===");
+            System.out.println("\n=== 회원 관리 ===");
             System.out.println("1.회원추가 2.회원수정 3.회원삭제 4.회원목록 5.돌아가기");
             int input = sc.nextInt();
 
@@ -239,7 +248,7 @@ public class MachineMain {
     }
 
     private static void showMember() {
-        System.out.println("=== 회원 목록 ===");
+        System.out.println("\n=== 회원 목록 ===");
         for (MemberVO m : ms.listMembers()) {
             System.out.println(m);
         }
@@ -247,8 +256,35 @@ public class MachineMain {
 
     private static void manageSales() {
         while (true) {
-            System.out.println("=== 판매 관리 ===");
-            System.out.println("1.제품별 판매 현황 2.회원별 판매 현황");
+            System.out.println("\n=== 판매 관리 ===");
+            System.out.println("1.제품별 판매 현황 2.회원별 판매 현황 3.돌아가기");
+            int input = sc.nextInt();
+            switch (input) {
+                case 1:
+                    // 제품별 판매 현황 출력
+                    List<String[]> productStats = ss.getSalesByProduct();
+                    // System.out.println("조회된 제품 판매 수: " + productStats.size());
+                    System.out.println("\n[제품별 판매 현황]");
+                    System.out.printf("%-1s | %-1s | %-1s\n", "제품명", "판매수량", "판매금액");
+                    for (String[] row : productStats) {
+                        System.out.printf("%-5s | %-5s | %-5s\n", row[0], row[1], row[2]);
+                    }
+                    break;
+                case 2:
+                    // 회원별 판매 현황 출력
+                    List<String[]> memberStats = ss.getSalesByMember();
+                    // System.out.println("조회된 제품 판매 수: " + memberStats.size());
+                    System.out.println("\n[회원별 판매 현황]");
+                    System.out.printf("%-1s | %-1s | %-1s | %-1s\n", "회원ID", "회원명", "구매금액", "충전잔액");
+                    for (String[] row : memberStats) {
+                        System.out.printf("%-5s | %-5s | %-5s | %-5s\n", row[0], row[1], row[2], row[3]);
+                    }
+                    break;
+                case 3:
+                    return;
+                default:
+                    System.out.println("잘못된 입력입니다.");
+            }
         }
     }
 
@@ -293,6 +329,7 @@ public class MachineMain {
 
     private static void buyProduct() {
         try {
+            showProduct();
             System.out.println("구매할 제품 ID 입력: ");
             int productID = sc.nextInt();
             ProductVO product = ps.getProduct(productID);
@@ -309,6 +346,10 @@ public class MachineMain {
             // 잔액 차감
             loginMember.setMoney(loginMember.getMoney() - product.getPrice());
             ms.updateMember(loginMember);
+            // 판매기록 저장
+            int sid = ss.generateSaleId();
+            SaleVO sale = new SaleVO(sid, loginMember.getMId(), productID, 1, product.getPrice(), null);
+            ss.recordSale(sale);
             // 최신 잔액 다시 조회
             System.out.println(product.getProduct() + "구매 완료" + "\n");
             showMoney();
@@ -318,6 +359,7 @@ public class MachineMain {
     }
 
     private static void showMoney() {
+        loginMember = ms.getMember(loginMember.getMId());
         System.out.println("현재 보유 금액 : " + loginMember.getMoney() + "원");
     }
 
