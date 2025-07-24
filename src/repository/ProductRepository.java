@@ -51,7 +51,7 @@ public class ProductRepository implements CrudInterfaceProduct {
         ProductVO p = null;
         ResultSet rs = null;
         try {
-            sql = "SELECT * FROM product WHERE pid = ?";
+            sql = "SELECT * FROM product WHERE pid = ? AND is_deleted = FALSE";
             psmt = conn.prepareStatement(sql);
             psmt.setInt(1, productID);
             rs = psmt.executeQuery();
@@ -101,15 +101,10 @@ public class ProductRepository implements CrudInterfaceProduct {
     public void delete(int productID) {
         // System.out.println("[ProductRepository.delete]");
         try {
-            sql = "DELTE FROM product WHERE pid = ?";
+            sql = "UPDATE product SET is_deleted = TRUE WHERE pid = ?";
             psmt = conn.prepareStatement(sql);
             psmt.setInt(1, productID);
             int result = psmt.executeUpdate();
-//            if (result > 0) {
-//                System.out.println("제품이 성공적으로 삭제되었습니다.");
-//            } else {
-//                System.out.println("삭제할 제품을 찾을 수 없습니다.");
-//            }
             psmt.close();
         } catch (SQLException e) {
             System.out.println("제품 삭제 실패 : " + e.toString());
@@ -153,7 +148,7 @@ public class ProductRepository implements CrudInterfaceProduct {
         List<ProductVO> productList = new ArrayList<>();
         ResultSet rs = null;
         try {
-            sql = "SELECT * FROM product";
+            sql = "SELECT * FROM product WHERE is_deleted = FALSE";
             psmt = conn.prepareStatement(sql);
             rs = psmt.executeQuery();
             while (rs.next()) {

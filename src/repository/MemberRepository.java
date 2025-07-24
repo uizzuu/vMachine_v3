@@ -24,17 +24,16 @@ public class MemberRepository implements CrudInterfaceMember {
     public int save(MemberVO member) {
         // System.out.println("[MemberRepository.save]");
         try {
-            sql = "INSERT INTO member(mid, id, pw, name, phone, money, card_no)";
-            sql = sql + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            sql = "INSERT INTO member(id, pw, name, phone, money, card_no)";
+            sql = sql + "VALUES (?, ?, ?, ?, ?, ?)";
             psmt = conn.prepareStatement(sql);
             // 각 ? 자리에 매핑
-            psmt.setInt(1, member.getMId());
-            psmt.setString(2, member.getId());
-            psmt.setString(3, member.getPw());
-            psmt.setString(4, member.getName());
-            psmt.setString(5, member.getPhone());
-            psmt.setInt(6, member.getMoney());
-            psmt.setString(7, member.getCardNo());
+            psmt.setString(1, member.getId());
+            psmt.setString(2, member.getPw());
+            psmt.setString(3, member.getName());
+            psmt.setString(4, member.getPhone());
+            psmt.setInt(5, member.getMoney());
+            psmt.setString(6, member.getCardNo());
             // 쿼리 실행하기
             int result = psmt.executeUpdate();
             psmt.close();
@@ -52,7 +51,7 @@ public class MemberRepository implements CrudInterfaceMember {
         MemberVO m = null;
         ResultSet rs = null;
         try {
-            sql = "SELECT * FROM member WHERE mid = ?";
+            sql = "SELECT * FROM member WHERE mid = ? AND is_deleted = FALSE";
             psmt = conn.prepareStatement(sql);
             psmt.setInt(1, mid);
             rs = psmt.executeQuery();
@@ -82,7 +81,7 @@ public class MemberRepository implements CrudInterfaceMember {
         MemberVO m = null;
         ResultSet rs = null;
         try {
-            sql = "SELECT * FROM member WHERE id = ?";
+            sql = "SELECT * FROM member WHERE id = ? AND is_deleted = FALSE";
             psmt = conn.prepareStatement(sql);
             psmt.setString(1, id);
             rs = psmt.executeQuery();
@@ -141,15 +140,10 @@ public class MemberRepository implements CrudInterfaceMember {
     public void delete(int mid) {
         // System.out.println("[MemberRepository.delete]");
         try {
-            sql = "DELETE FROM member WHERE mid = ?";
+            sql = "UPDATE member SET is_deleted = TRUE WHERE mid = ?";
             psmt = conn.prepareStatement(sql);
             psmt.setInt(1, mid);
             int result = psmt.executeUpdate();
-//            if (result > 0) {
-//                System.out.println("회원이 성공적으로 삭제되었습니다.");
-//            } else {
-//                System.out.println("삭제할 회원을 찾을 수 없습니다.");
-//            }
             psmt.close();
         } catch (SQLException e) {
             System.out.println("회원 삭제 실패 : " + e.toString());
@@ -187,7 +181,7 @@ public class MemberRepository implements CrudInterfaceMember {
         List<MemberVO> memberList = new ArrayList<>();
         ResultSet rs = null;
         try {
-            sql = "SELECT * FROM member";
+            sql = "SELECT * FROM member WHERE is_deleted = FALSE";
             psmt = conn.prepareStatement(sql);
             // SQL 구문 실행
             rs = psmt.executeQuery();
