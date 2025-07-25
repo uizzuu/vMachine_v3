@@ -41,7 +41,7 @@ public class MachineMain {
 
     private static boolean showLoginMenu() throws MyException {
             System.out.println("\n=== 자판기(회원제) === ");
-            System.out.println("1.회원가입 2.로그인 3.종료 0.관리자");
+            System.out.println("1.회원가입 2.로그인 3.종료");
             int input = -1;
         try {
             input = sc.nextInt();
@@ -52,9 +52,6 @@ public class MachineMain {
             return true;
         }
             switch (input) {
-                case 0:
-                    showAdminMenu();
-                    break;
                 case 1:
                     // 회원가입
                     signup();
@@ -103,9 +100,9 @@ public class MachineMain {
                 throw new MyException("유효하지 않은 카드 번호입니다. 다시 입력해주세요.");
             }
         }
-        int mid = ms.generateMemberId();
+        // int mid = ms.generateMemberId();
         // 초기 충전 0
-        MemberVO member = new MemberVO(mid, id, pw, name, phone, 0, cardNo);
+        MemberVO member = new MemberVO(id, pw, name, phone, 0, cardNo);
         ms.signup(member);
     }
 
@@ -146,8 +143,15 @@ public class MachineMain {
             System.out.println("비밀번호 : ");
             String pw = sc.nextLine();
             loginMember = ms.login(id, pw);
-            System.out.println(loginMember.getName() + "님 환영합니다.");
-            showUserMenu();
+            if (loginMember == null) {
+                System.out.println("로그인 실패 : 사용자 정보를 찾을 수 없습니다.");
+            }
+            else if ("admin".equals(loginMember.getId())) {
+                showAdminMenu();
+            } else {
+                System.out.println(loginMember.getName() + "님 환영합니다.");
+                showUserMenu();
+            }
         } catch (MyException e) {
             System.out.println("로그인 실패 : " + e.getMessage());
         }
@@ -281,10 +285,10 @@ public class MachineMain {
                     // 회원 추가
                     try {
                         addMember();
+                        System.out.println("회원 추가가 완료되었습니다.");
                     } catch (MyException e) {
                         System.out.println("회원추가 오류 : " + e.getMessage());
                     }
-                    System.out.println("회원 추가가 완료되었습니다.");
                     break;
                 case 2:
                     // 회원 수정
@@ -379,7 +383,7 @@ public class MachineMain {
     private static void manageSales() {
         while (true) {
             System.out.println("\n=== 판매 관리 ===");
-            System.out.println("1.제품별 판매 현황 2.회원별 판매 현황 3.돌아가기");
+            System.out.println("1.제품별 판매 현황 2.회원별 판매 현황 3.월별 판매 현황 4.돌아가기");
             int input = -1;
             try {
                 input = sc.nextInt();
@@ -421,6 +425,32 @@ public class MachineMain {
                     }
                     break;
                 case 3:
+                    // 회원별 판매 현황 출력
+                    System.out.println("조회할 연월 입력 (예 : 2025-07) : ");
+                    String yearMonth = null;
+                    while (true) {
+                        yearMonth = sc.nextLine();
+                        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
+                            System.out.println("잘못된 입력입니다. YYYY-MM 형식으로 입력하세요.");
+                        } else {
+                            break;
+                        }
+                    }
+                    List<String[]> monthStats = ss.getSalesByMonth(yearMonth);
+                    // System.out.println("조회된 제품 판매 수: " + memberStats.size());
+                    String print = yearMonth.substring(0, 4) + "년 " + yearMonth.substring(5, 7) + "월";
+                    System.out.println("\n[" + print + " 판매 현황]");
+                    System.out.printf("%-1s | %-1s | %-1s\n", "제품명", "판매수량", "판매금액");
+                    System.out.println("----------------------------------------------");
+                    if (monthStats.isEmpty()) {
+                        System.out.println("판매된 제품이 없습니다.");
+                    } else {
+                        for (String[] row : monthStats) {
+                            System.out.printf("%-10s | %-10s | %-10s\n", row[0], row[1], row[2]);
+                        }
+                    }
+                    break;
+                case 4:
                     return;
                 default:
                     System.out.println("잘못된 입력입니다.");

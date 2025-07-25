@@ -51,7 +51,7 @@ public class MemberRepository implements CrudInterfaceMember {
         MemberVO m = null;
         ResultSet rs = null;
         try {
-            sql = "SELECT * FROM member WHERE mid = ? AND is_deleted = FALSE";
+            sql = "SELECT * FROM member WHERE mid = ? AND (id = 'admin' OR is_deleted = FALSE)";
             psmt = conn.prepareStatement(sql);
             psmt.setInt(1, mid);
             rs = psmt.executeQuery();
@@ -81,7 +81,7 @@ public class MemberRepository implements CrudInterfaceMember {
         MemberVO m = null;
         ResultSet rs = null;
         try {
-            sql = "SELECT * FROM member WHERE id = ? AND is_deleted = FALSE";
+            sql = "SELECT * FROM member WHERE id = ? AND (id = 'admin' OR is_deleted = FALSE)";
             psmt = conn.prepareStatement(sql);
             psmt.setString(1, id);
             rs = psmt.executeQuery();
@@ -209,7 +209,7 @@ public class MemberRepository implements CrudInterfaceMember {
     }
 
     // ID 자동 생성
-    private int memberIdSeq = 1;
+    private int memberIdSeq = 0;
 
     @Override
     public int generateId() {

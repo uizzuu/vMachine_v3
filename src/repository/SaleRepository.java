@@ -8,9 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SaleRepository implements CrudInterfaceSale {
     // DB 연결
@@ -24,14 +22,13 @@ public class SaleRepository implements CrudInterfaceSale {
     public void save(SaleVO sale) {
         // System.out.println("[SaleRepository.save]");
         try {
-            sql = "INSERT INTO sale(sid, mid, pid, quantity, total_price, sale_time)" +
-                    "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+            sql = "INSERT INTO sale(mid, pid, quantity, total_price, sale_time)" +
+                    "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)";
             psmt = conn.prepareStatement(sql);
-            psmt.setInt(1, sale.getSaleId());
-            psmt.setInt(2, sale.getMemberId());
-            psmt.setInt(3, sale.getProductId());
-            psmt.setInt(4, sale.getQuantity());
-            psmt.setInt(5, sale.getTotalPrice());
+            psmt.setInt(1, sale.getMemberId());
+            psmt.setInt(2, sale.getProductId());
+            psmt.setInt(3, sale.getQuantity());
+            psmt.setInt(4, sale.getTotalPrice());
             psmt.executeUpdate();
             psmt.close();
         } catch (SQLException e) {
@@ -120,5 +117,36 @@ public class SaleRepository implements CrudInterfaceSale {
             System.out.println("회원별 판매 집계 실패 : " + e.toString());
         }
         return result;
+    }
+
+    // 월별 판매 집계 (이름, 수량, 총금액)
+    @Override
+    public List<String[]> getSalesByMonth(String yearMonth) {
+    // System.out.println("[SaleRepository.getSalesByMember]");
+    List<String[]> result = new ArrayList<>();
+    try {
+        sql = "SELECT p.name AS 제품명, SUM(s.quantity) AS 판매수량," +
+                "SUM(s.total_price) AS 판매금액 FROM sale s " +
+                "JOIN product p ON s.pid = p.pid " +
+                "WHERE s.sale_time >= STR_TO_DATE(CONCAT(?, '-01'), '%Y-%m-%d') " +
+                "AND s.sale_time <  DATE_ADD(STR_TO_DATE(CONCAT(?, '-01'), '%Y-%m-%d'), INTERVAL 1 MONTH) " +
+                "GROUP BY p.name;";
+        psmt = conn.prepareStatement(sql);
+        psmt.setString(1, yearMonth);
+        psmt.setString(2, yearMonth);
+        rs = psmt.executeQuery();
+        while (rs.next()) {
+            result.add(new String[]{
+                    rs.getString("제품명"),
+                    String.valueOf(rs.getInt("판매수량")),
+                    String.valueOf(rs.getInt("판매금액"))
+            });
+        }
+        rs.close();
+        psmt.close();
+    } catch (SQLException e) {
+        System.out.println("월별 판매 집계 실패 : " + e.toString());
+    }
+    return result;
     }
 }

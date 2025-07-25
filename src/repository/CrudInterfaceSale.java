@@ -16,4 +16,7 @@ public interface CrudInterfaceSale {
 
     // 회원별 판매 집계 (이름, 수량, 총금액)
     List<String[]> getSalesByMember();
+
+    // 월별 판매 집계 (이름, 수량, 총금액)
+    List<String[]> getSalesByMonth(String yearMonth);
 }

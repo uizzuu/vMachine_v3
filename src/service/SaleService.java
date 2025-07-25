@@ -30,6 +30,11 @@ public class SaleService {
         return sr.getSalesByMember();
     }
 
+    // 월별 판매 집계 결과 반환
+    public List<String[]> getSalesByMonth(String yearMonth){
+        return sr.getSalesByMonth(yearMonth);
+    }
+
     // 전체 판매 목록 필요
     public List<SaleVO> listAllSales() {
         return sr.findAll();

@@ -12,8 +12,8 @@ public class MemberVO {
     // 생성자
     public MemberVO(){}
 
-    public MemberVO(int mid, String id, String pw, String name, String phone, int money, String cardNo) {
-        this.mid = mid;
+    public MemberVO(String id, String pw, String name, String phone, int money, String cardNo) {
+        // this.mid = mid;
         this.id = id;
         this.pw = pw;
         this.name = name;
@@ -29,7 +29,7 @@ public class MemberVO {
                 ", 아이디=" + id +
                 ", 비밀번호=" + pw +
                 ", 회원명=" + name +
-                ", 전화번호='" + phone +
+                ", 전화번호=" + phone +
                 ", 보유금액=" + money +
                 ", 카드번호=" + cardNo +
                 ']';
